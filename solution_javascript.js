@@ -2,18 +2,49 @@ class EventSourcer {
   constructor() {
     this.value = 0;
     this.events = new List();
-    //
-    this.events.add(new Node(this.value));
   }
 
   add(num) {
+    this.value += num;
+    this.events.addNode(new Node({'operation': 'add', 'value': num}));
+  }
+
+  subtract(num) {
+    this.value -= num;
+    this.events.addNode(new Node({'operation': 'subtract', 'value': num}));
+  }
+
+  undo() {
+    event = this.events.undo();
+    if (event) {
+      if (event.operation.localeCompare('add')) {
+        this.value -= event.value;
+      }
+      else {
+        this.value += event.value;
+      }
+    }
+  }
+
+  redo() {
+    event = this.events.redo();
+    if (event) {
+      if (event.operation.localeCompare('add')) {
+        this.value += event.value;
+      }
+      else {
+        this.value -= event.value;
+      }
+    }
+  }
+
+  bulk_undo(num) {
 
   }
-  subtract(num) {}
-  undo() {}
-  redo() {}
-  bulk_undo(num) {}
-  bulk_redo(num) {}
+
+  bulk_redo(num) {
+    
+  }
 }
 
 //doubly linked list node
@@ -25,32 +56,45 @@ class Node {
   }
 }
 
-//simple doubly linked list implementation
+//doubly linked list implementation
 class List {
   constructor() {
     this.start = null;
     this.end = null;
-    this.size = 0;
+    this.currEvent = null;
   }
 
-  add(node) {
+  addNode(node) {
     if (this.size == 0) {
       this.start = node;
       this.end = node;
+      this.currEvent = this.end;
     }
-    else {
+    else if (this.currEvent == this.end) { //if there is nothing to redo
       this.end.next = node;
       this.end = node;
+      this.currEvent = this.end;
     }
-    this.size++;
+    else { //overwrite the next redo-able action
+      this.currEvent.next = node;
+      this.currEvent = node;
+    }
   }
 
-  remove() {
-    if (this.size > 1) {
-      newEnd = this.end.prev;
-      this.end = newEnd;
-      this.size--;
+  undo() {
+    if (this.currEvent.prev) {
+      this.currEvent = this.currEvent.prev;
+      return this.currEvent.element;
     }
+    return null;
+  }
+
+  redo() {
+    if (this.currEvent.next) {
+      this.currEvent = this.currEvent.next;
+      return this.currEvent.element;
+    }
+    return null;
   }
 
 }
