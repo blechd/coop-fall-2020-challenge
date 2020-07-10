@@ -39,11 +39,15 @@ class EventSourcer {
   }
 
   bulk_undo(num) {
-
+    for (let i = 0; i < num; i++) {
+      this.undo();
+    }
   }
 
   bulk_redo(num) {
-
+    for (let i = 0; i < num; i++) {
+      this.redo();
+    }
   }
 }
 
