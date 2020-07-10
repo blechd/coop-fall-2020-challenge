@@ -2,9 +2,13 @@ class EventSourcer {
   constructor() {
     this.value = 0;
     this.events = new List();
+    //
+    this.events.add(new Node(this.value));
   }
 
-  add(num) {}
+  add(num) {
+
+  }
   subtract(num) {}
   undo() {}
   redo() {}
@@ -45,12 +49,8 @@ class List {
     if (this.size > 1) {
       newEnd = this.end.prev;
       this.end = newEnd;
+      this.size--;
     }
-    else {
-      this.start = null;
-      this.end = null;
-    }
-    this.size--;
   }
 
 }
