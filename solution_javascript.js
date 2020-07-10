@@ -94,9 +94,10 @@ class List {
   }
 
   undo() {
-    if (this.currEvent && this.currEvent.prev) {
+    if (this.currEvent) {
+      let element = this.currEvent.element;
       this.currEvent = this.currEvent.prev;
-      return this.currEvent.element;
+      return element;
     }
     return null;
   }
