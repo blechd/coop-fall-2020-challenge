@@ -15,9 +15,9 @@ class EventSourcer {
   }
 
   undo() {
-    event = this.events.undo();
+    let event = this.events.undo();
     if (event) {
-      if (event.operation.localeCompare('add')) {
+      if (0 == event.operation.localeCompare('add')) {
         this.value -= event.value;
       }
       else {
@@ -27,9 +27,9 @@ class EventSourcer {
   }
 
   redo() {
-    event = this.events.redo();
+    let event = this.events.redo();
     if (event) {
-      if (event.operation.localeCompare('add')) {
+      if (0 == event.operation.localeCompare('add')) {
         this.value += event.value;
       }
       else {
@@ -43,7 +43,7 @@ class EventSourcer {
   }
 
   bulk_redo(num) {
-    
+
   }
 }
 
@@ -61,6 +61,7 @@ class List {
   constructor() {
     this.start = null;
     this.end = null;
+    this.size = 0;
     this.currEvent = null;
   }
 
@@ -72,17 +73,24 @@ class List {
     }
     else if (this.currEvent == this.end) { //if there is nothing to redo
       this.end.next = node;
+      node.prev = this.end;
       this.end = node;
       this.currEvent = this.end;
     }
-    else { //overwrite the next redo-able action
+    else { //overwrite the next redo-able action (replace the next node)
+      let temp = this.currEvent.next;
+      node.next = temp.next;
+      node.prev = temp.prev;
+
+      temp.prev = node;
       this.currEvent.next = node;
       this.currEvent = node;
     }
+    this.size++;
   }
 
   undo() {
-    if (this.currEvent.prev) {
+    if (this.currEvent && this.currEvent.prev) {
       this.currEvent = this.currEvent.prev;
       return this.currEvent.element;
     }
@@ -90,7 +98,7 @@ class List {
   }
 
   redo() {
-    if (this.currEvent.next) {
+    if (this.currEvent && this.currEvent.next) {
       this.currEvent = this.currEvent.next;
       return this.currEvent.element;
     }
